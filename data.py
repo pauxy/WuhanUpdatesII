@@ -9,7 +9,8 @@ class Country:
     incident = None
     mortality = None
 
-    def __init__(self, name, update, latlong, confirmed, death, recovered, active, incident, mortality):
+    def __init__(self, name, update, latlong, confirmed, death, recovered, active, incident,
+                 mortality):
         self.name = name
         self.update = update
         self.latlong = latlong
@@ -20,7 +21,7 @@ class Country:
         self.incident = incident
         self.mortality = mortality
 
-    def print(self):
+    def beautify(self):
         beautified = "Name : {0}\n\
 Last Updated : {1}\n\
 Lat Long : {2}\n\
@@ -28,5 +29,6 @@ Confirmed cases : {3}\n\
 Deaths : {4}\n\
 Recovered : {5}\n\
 Active Cases : {6}\n\
-Mortality Rate : {7}%\n".format(self.name, self.update, self.latlong, self.confirmed, self.death, self.recovered, self.active, self.mortality)
+Mortality Rate : {7}%\n".format(self.name, self.update, self.latlong, self.confirmed, self.death,
+                                self.recovered, self.active, self.mortality)
         return beautified

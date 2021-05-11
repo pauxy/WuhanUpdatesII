@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import covid
 import logging
 import sys
 from telegram import Update, ForceReply
@@ -36,7 +37,9 @@ def error(update, context, iserror=False):
 
 
 def get(update, context):
-    update.message.reply_text("reply with data regarding " + context.args[0])
+    country = context.args[0]
+    message = "`" + covid.getcountry(country) + "`"
+    pythoupdate.message.reply_text(message, parse_mode="Markdown")
 
 
 def main() -> None:
