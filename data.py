@@ -34,4 +34,4 @@ Mortality Rate : {7}%\n".format(self.name, self.update, self.latlong, self.confi
         return beautified
     
     def listoutput(self,comparison):
-        return "{0} - {1}\n".format(self.name,comparison)
+        return "{0}     -     {1}\n".format(self.name,str(round(comparison,3)))

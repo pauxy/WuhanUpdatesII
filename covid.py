@@ -83,7 +83,7 @@ def listcountry(number, sort):
     if DATADAY == None or gettoday() != DATADAY:
         retrieve()
     mysort = SORTING[sort]
-    output = ""
+    output = "Sorted by "+sort+"\n---------------------------\n"
     for country in mysort[:number]:
         output += country.listoutput(getattr(country,sort))
     return output
