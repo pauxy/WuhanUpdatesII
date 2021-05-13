@@ -21,7 +21,7 @@ def list(update, context):
     if not number.isdigit():
         error(update, context, True)
     else:
-        message = covid.listcountry(int(number),sort)
+        message = "`"+covid.listcountry(int(number),sort)+"`"
         update.message.reply_text(message, parse_mode="Markdown")
 
 

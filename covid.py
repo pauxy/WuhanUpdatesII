@@ -74,7 +74,7 @@ def getcountry(country):
     if DATADAY == None or gettoday() != DATADAY:
         retrieve()
     if country.lower() in COVIDDATA.keys():
-        return COVIDDATA[country].beautify()
+        return COVIDDATA[country.lower()].beautify()
     else:
         return False
 
