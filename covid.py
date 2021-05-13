@@ -8,49 +8,70 @@ WHOSITE = "https://opendata.arcgis.com/datasets/1cb306b5331945548745a5ccd290188e
 DATADAY = None
 COVIDDATA = {}
 NONDUPE = []
-SORTING={"death":[],"mortality":[],"confirmed":[]}
+SORTING = {"death": [], "mortality": [], "confirmed": []}
+"""
+    get today's date, used to keep track of the age of current data
+
+    Returns:
+        String : todays date in ddmmyyyy format
+"""
+
 
 def gettoday():
     today = date.today()
     return today.strftime("%d%m%Y")
 
+
+"""
+    initialises a country object for the given json object
+
+    Returns:
+        Country : country object for current country with all variables entered
+"""
+
+
 def setcountry(country):
-        properties = country["properties"]
-        names = [properties["Country_Region"]]
-        update = properties["Last_Update"]
-        latlong = (properties["Lat"], properties["Long_"])
-        confirmed = int(properties["Confirmed"])
-        death = int(properties["Deaths"])
-        recovered = properties["Recovered"]
-        active = properties["Active"]
-        incident = properties["Incident_Rate"]
-        mortality = properties["Mortality_Rate"]
-        currcountry = data.Country(names[0], update, latlong, confirmed, death, recovered, active,
-                                   incident, mortality)
-        return currcountry
+    properties = country["properties"]
+    names = [properties["Country_Region"]]
+    update = properties["Last_Update"]
+    latlong = (properties["Lat"], properties["Long_"])
+    confirmed = int(properties["Confirmed"])
+    death = int(properties["Deaths"])
+    recovered = properties["Recovered"]
+    active = properties["Active"]
+    incident = properties["Incident_Rate"]
+    mortality = properties["Mortality_Rate"]
+    currcountry = data.Country(names[0], update, latlong, confirmed, death, recovered, active,
+                               incident, mortality)
+    return currcountry
+
 
 def retrieve():
-    global FILEDAY
     global COVIDDATA
     global NONDUPE
+    global SORTING
+    global DATADAY
     COVIDDATA = {}
     COUNTRYNAMES = {}
     req = requests.get(WHOSITE, allow_redirects=True)
     DATADAY = gettoday()
+    NONDUPE = []
     rawcovidjson = json.loads(req.content)["features"]
     for country in rawcovidjson:
         currcountry = setcountry(country)
         names = [currcountry.name]
         if " and " in names[0]:
             names += names[0].split(" and ")
-        for  name in names:
-            COVIDDATA[name.lower()]=currcountry
+        for name in names:
+            COVIDDATA[name.lower()] = currcountry
         NONDUPE.append(currcountry)
-
-    
+    SORTING["death"] = death()
+    SORTING["mortality"] = morta()
+    SORTING["confirmed"] = confi()
 
 
 def getcountry(country):
+    possible = []
     if DATADAY == None or gettoday() != DATADAY:
         retrieve()
     if country.lower() in COVIDDATA.keys():
@@ -58,9 +79,24 @@ def getcountry(country):
     else:
         return False
 
+
 def listcountry(number, sort):
-    clean = SORTING[sort]
-    output =""
-    for country in clean[:number]:
-        output += country[1].listoutput(country.death)
+    if DATADAY == None or gettoday() != DATADAY:
+        retrieve()
+    mysort = SORTING[sort]
+    output = ""
+    for country in mysort[:number]:
+        output += country.listoutput(22)
     return output
+
+
+def death():
+    return sorted(NONDUPE, key=lambda x: x.death, reverse=True)
+
+
+def morta():
+    return sorted(NONDUPE, key=lambda x: x.mortality, reverse=True)
+
+
+def confi():
+    return sorted(NONDUPE, key=lambda x: x.confirmed, reverse=True)
