@@ -5,39 +5,62 @@ import json
 import data
 
 WHOSITE = "https://opendata.arcgis.com/datasets/1cb306b5331945548745a5ccd290188e_2.geojson"
-FILEDAY = None
+DATADAY = None
 COVIDDATA = {}
-
+NONDUPE = []
+SORTING={"death":[],"mortality":[],"confirmed":[]}
 
 def gettoday():
     today = date.today()
     return today.strftime("%d%m%Y")
 
-
-def retrieve():
-    global FILEDAY
-    global COVIDDATA
-    COVIDDATA = {}
-    req = requests.get(WHOSITE, allow_redirects=True)
-    FILEDAY = gettoday()
-    rawcovidjson = json.loads(req.content)["features"]
-    for country in rawcovidjson:
+def setcountry(country):
         properties = country["properties"]
-        name = properties["Country_Region"]
+        names = [properties["Country_Region"]]
         update = properties["Last_Update"]
         latlong = (properties["Lat"], properties["Long_"])
-        confirmed = properties["Confirmed"]
-        death = properties["Deaths"]
+        confirmed = int(properties["Confirmed"])
+        death = int(properties["Deaths"])
         recovered = properties["Recovered"]
         active = properties["Active"]
         incident = properties["Incident_Rate"]
         mortality = properties["Mortality_Rate"]
-        currcountry = data.Country(name, update, latlong, confirmed, death, recovered, active,
+        currcountry = data.Country(names[0], update, latlong, confirmed, death, recovered, active,
                                    incident, mortality)
-        COVIDDATA[name] = currcountry
+        return currcountry
+
+def retrieve():
+    global FILEDAY
+    global COVIDDATA
+    global NONDUPE
+    COVIDDATA = {}
+    COUNTRYNAMES = {}
+    req = requests.get(WHOSITE, allow_redirects=True)
+    DATADAY = gettoday()
+    rawcovidjson = json.loads(req.content)["features"]
+    for country in rawcovidjson:
+        currcountry = setcountry(country)
+        names = [currcountry.name]
+        if " and " in names[0]:
+            names += names[0].split(" and ")
+        for  name in names:
+            COVIDDATA[name.lower()]=currcountry
+        NONDUPE.append(currcountry)
+
+    
 
 
 def getcountry(country):
-    if FILEDAY == None or gettoday() != FILEDAY:
+    if DATADAY == None or gettoday() != DATADAY:
         retrieve()
-    return COVIDDATA[country].beautify()
+    if country.lower() in COVIDDATA.keys():
+        return COVIDDATA[country].beautify()
+    else:
+        return False
+
+def listcountry(number, sort):
+    clean = SORTING[sort]
+    output =""
+    for country in clean[:number]:
+        output += country[1].listoutput(country.death)
+    return output

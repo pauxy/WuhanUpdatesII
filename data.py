@@ -32,3 +32,6 @@ Active Cases : {6}\n\
 Mortality Rate : {7}%\n".format(self.name, self.update, self.latlong, self.confirmed, self.death,
                                 self.recovered, self.active, self.mortality)
         return beautified
+    
+    def listoutput(self,comparison):
+        return "{0} - {1}\n".format(self.name,comparison)
