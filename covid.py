@@ -65,9 +65,8 @@ def retrieve():
         for name in names:
             COVIDDATA[name.lower()] = currcountry
         NONDUPE.append(currcountry)
-    SORTING["death"] = death()
-    SORTING["mortality"] = morta()
-    SORTING["confirmed"] = confi()
+    for key in SORTING.keys():
+        SORTING[key] = sorted(NONDUPE, key=lambda x: getattr(x,key), reverse=True)
 
 
 def getcountry(country):
@@ -86,17 +85,6 @@ def listcountry(number, sort):
     mysort = SORTING[sort]
     output = ""
     for country in mysort[:number]:
-        output += country.listoutput(22)
+        output += country.listoutput(getattr(country,sort))
     return output
 
-
-def death():
-    return sorted(NONDUPE, key=lambda x: x.death, reverse=True)
-
-
-def morta():
-    return sorted(NONDUPE, key=lambda x: x.mortality, reverse=True)
-
-
-def confi():
-    return sorted(NONDUPE, key=lambda x: x.confirmed, reverse=True)
